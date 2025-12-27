@@ -5,7 +5,7 @@
 //    DATE: 2025-06-11
 // PURPOSE: Arduino library for the INA238, I2C, 16 bit, voltage, current and power sensor.
 //     URL: https://github.com/RobTillaart/INA238
-//          https://www.adafruit.com/product/6349 
+//          https://www.adafruit.com/product/6349
 //
 //  Read the datasheet for the details
 
@@ -134,24 +134,20 @@ public:
 
   //
   //  CONFIG REGISTER 0
-  //  read datasheet for details, section 7.6.1.1, page 22
+  //  read datasheet for details, section 7.6.1.1, page 21  CHECK
   //
   void     reset();
-  //  value: 0 == normal operation,  1 = clear registers
-  bool     setAccumulation(uint8_t value);
-  bool     getAccumulation();
   //  Conversion delay in 0..255 steps of 2 ms
   void     setConversionDelay(uint8_t steps);
   uint8_t  getConversionDelay();
-  void     setTemperatureCompensation(bool on);
-  bool     getTemperatureCompensation();
-  //  flag = false => 164 mV, true => 41 mV
+  //  flag = false => ~163.84 mV, true => ~40.96 mV
   void     setADCRange(bool flag);
   bool     getADCRange();
 
+
   //
   //  CONFIG ADC REGISTER 1
-  //  read datasheet for details, section 7.6.1.2, page 22++
+  //  read datasheet for details, section 7.6.1.2, page 21++  CHECK
   //
   bool     setMode(uint8_t mode = INA238_MODE_CONT_TEMP_BUS_SHUNT);
   uint8_t  getMode();
@@ -167,27 +163,21 @@ public:
 
   //
   //  SHUNT CALIBRATION REGISTER 2
-  //  read datasheet for details. use with care.
-  //  maxCurrent <= 204, (in fact no limit)
-  //  shunt >= 0.0001.
-  //  returns _current_LSB;
+  //  read datasheet for details, section 7.6.1.3, page 23  CHECK
+  //  use with care.
+  //  maxCurrent <= 204, (in fact no limit)  TODO ??
+  //  shunt >= 0.0001.                       TODO ??
+  //  returns _current_LSB;                  TODO ??
   int      setMaxCurrentShunt(float maxCurrent, float shunt);
   bool     isCalibrated()    { return _current_LSB != 0.0; };
   float    getMaxCurrent();
   float    getShunt();
   float    getCurrentLSB();
 
-  //
-  //  SHUNT TEMPERATURE COEFFICIENT REGISTER 3
-  //  read datasheet for details, page 16.
-  //  ppm = 0..16383.
-  bool     setShuntTemperatureCoefficent(uint16_t ppm = 0);
-  uint16_t getShuntTemperatureCoefficent();
-
 
   //
   //  DIAGNOSE ALERT REGISTER 11  (0x0B)
-  //  read datasheet for details, section 7.6.1.12, page 26++.
+  //  read datasheet for details, section 7.6.1.9, page 24++ CHECK
   //
   void     setDiagnoseAlert(uint16_t flags);
   uint16_t getDiagnoseAlert();
@@ -196,6 +186,11 @@ public:
   void     setDiagnoseAlertBit(uint8_t bit);
   void     clearDiagnoseAlertBit(uint8_t bit);
   uint16_t getDiagnoseAlertBit(uint8_t bit);
+
+
+
+// ------
+
 
 
   //
@@ -250,8 +245,12 @@ protected:
 };
 
 
-//  INA237
+///////////////////////////////////////
+//
+//  DERIVED INA237
+//
 
+//  TODO
 
 //  -- END OF FILE --
 

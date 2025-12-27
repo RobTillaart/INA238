@@ -103,22 +103,6 @@ void test_core()
   Serial.print(stop - start);
   Serial.println();
   delay(10);
-
-  start = micros();
-  f = INA.getEnergy();
-  stop = micros();
-  Serial.print("getEnergy:\t");
-  Serial.print(stop - start);
-  Serial.println();
-  delay(10);
-
-  start = micros();
-  f = INA.getCharge();
-  stop = micros();
-  Serial.print("getCharge:\t");
-  Serial.print(stop - start);
-  Serial.println();
-  delay(10);
 }
 
 
@@ -130,14 +114,6 @@ void test_config()
   delay(10);
 
   start = micros();
-  value = INA.getAccumulation();
-  stop = micros();
-  Serial.print("getAccumulation:\t");
-  Serial.print(stop - start);
-  Serial.println();
-  delay(10);
-
-  start = micros();
   value = INA.getConversionDelay();
   stop = micros();
   Serial.print("getConversionDelay:\t");
@@ -145,13 +121,6 @@ void test_config()
   Serial.println();
   delay(10);
 
-  start = micros();
-  value = INA.getTemperatureCompensation();
-  stop = micros();
-  Serial.print("getTemperatureCompensation:\t");
-  Serial.print(stop - start);
-  Serial.println();
-  delay(10);
 
   start = micros();
   value = INA.getADCRange();
@@ -217,14 +186,6 @@ void test_others()
 {
   Serial.println();
   Serial.println(__FUNCTION__);
-  delay(10);
-
-  start = micros();
-  value = INA.getShuntTemperatureCoefficent();
-  stop = micros();
-  Serial.print("getShuntTemperatureCoefficent:\t");
-  Serial.print(stop - start);
-  Serial.println();
   delay(10);
 
   start = micros();

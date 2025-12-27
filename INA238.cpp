@@ -4,7 +4,7 @@
 //    DATE: 2025-06-11
 // PURPOSE: Arduino library for the INA238, I2C, 16 bit, voltage, current and power sensor.
 //     URL: https://github.com/RobTillaart/INA238
-//          https://www.adafruit.com/product/6349 
+//          https://www.adafruit.com/product/6349
 
 //
 //  Read the datasheet for the details
@@ -16,14 +16,11 @@
 #define INA238_CONFIG               0x00    //  16   RW
 #define INA238_ADC_CONFIG           0x01    //  16   RW
 #define INA238_SHUNT_CAL            0x02    //  16   RW
-#define INA238_SHUNT_TEMP_CO        0x03    //  16   RW
-#define INA238_SHUNT_VOLTAGE        0x04    //  24   R-
-#define INA238_BUS_VOLTAGE          0x05    //  24   R-
+#define INA238_SHUNT_VOLTAGE        0x04    //  16   R-
+#define INA238_BUS_VOLTAGE          0x05    //  16   R-
 #define INA238_TEMPERATURE          0x06    //  16   R-
-#define INA238_CURRENT              0x07    //  24   R-
+#define INA238_CURRENT              0x07    //  16   R-
 #define INA238_POWER                0x08    //  24   R-
-#define INA238_ENERGY               0x09    //  40   R-
-#define INA238_CHARGE               0x0A    //  40   R-
 #define INA238_DIAG_ALERT           0x0B    //  16   RW
 #define INA238_SOVL                 0x0C    //  16   RW
 #define INA238_SUVL                 0x0D    //  16   RW
@@ -37,11 +34,9 @@
 
 //  CONFIG MASKS (register 0)
 #define INA238_CFG_RST              0x8000
-#define INA238_CFG_RSTACC           0x4000
 #define INA238_CFG_CONVDLY          0x3FC0
-#define INA238_CFG_TEMPCOMP         0x0020
 #define INA238_CFG_ADCRANGE         0x0010
-#define INA238_CFG_RESERVED         0x000F  //  all unused bits
+#define INA238_CFG_RESERVED         0x402F  //  all unused bits
 
 
 //  ADC MASKS (register 1)
@@ -167,21 +162,6 @@ void INA238::reset()
   _writeRegister(INA238_CONFIG, value);
 }
 
-bool INA238::setAccumulation(uint8_t value)
-{
-  if (value > 1) return false;
-  uint16_t reg = _readRegister(INA238_CONFIG, 2);
-  if (value == 1) reg |= INA238_CFG_RSTACC;
-  else            reg &= ~INA238_CFG_RSTACC;
-  _writeRegister(INA238_CONFIG, reg);
-  return true;
-}
-
-bool INA238::getAccumulation()
-{
-  uint16_t value = _readRegister(INA238_CONFIG, 2);
-  return (value & INA238_CFG_RSTACC) > 0;
-}
 
 void INA238::setConversionDelay(uint8_t steps)
 {
@@ -195,20 +175,6 @@ uint8_t INA238::getConversionDelay()
 {
   uint16_t value = _readRegister(INA238_CONFIG, 2);
   return (value >> 6) & 0xFF;
-}
-
-void INA238::setTemperatureCompensation(bool on)
-{
-  uint16_t value = _readRegister(INA238_CONFIG, 2);
-  if (on) value |= INA238_CFG_TEMPCOMP;
-  else    value &= ~INA238_CFG_TEMPCOMP;
-  _writeRegister(INA238_CONFIG, value);
-}
-
-bool INA238::getTemperatureCompensation()
-{
-  uint16_t value = _readRegister(INA238_CONFIG, 2);
-  return (value & INA238_CFG_TEMPCOMP) > 0;
 }
 
 void INA238::setADCRange(bool flag)
@@ -354,24 +320,6 @@ float INA238::getShunt()
 float INA238::getCurrentLSB()
 {
   return _current_LSB;
-}
-
-
-////////////////////////////////////////////////////////
-//
-//  SHUNT TEMPERATURE COEFFICIENT REGISTER 3
-//
-bool INA238::setShuntTemperatureCoefficent(uint16_t ppm)
-{
-  if (ppm > 16383) return false;
-  _writeRegister(INA238_SHUNT_TEMP_CO, ppm);
-  return true;
-}
-
-uint16_t INA238::getShuntTemperatureCoefficent()
-{
-  uint16_t value = _readRegister(INA238_SHUNT_TEMP_CO, 2);
-  return value;
 }
 
 
