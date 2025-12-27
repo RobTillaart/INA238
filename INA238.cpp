@@ -58,7 +58,7 @@ INA238::INA238(const uint8_t address, TwoWire *wire)
   //  no calibrated values by default.
   _shunt       = 0.015;
   _maxCurrent  = 10.0;
-  _current_LSB = _maxCurrent * pow(2, -15);   //  TODO ??
+  _current_LSB = _maxCurrent * pow(2, -15);   //  TODO verify ??
   _error       = 0;
 }
 
@@ -93,62 +93,59 @@ uint8_t INA238::getAddress()
 float INA238::getBusVoltage()
 {
   //  always positive, remove reserved bits.
-  int32_t value = _readRegister(INA238_BUS_VOLTAGE, 2);
+  int16_t value = _readRegister(INA238_BUS_VOLTAGE, 2);
   float bus_LSB = 3.125;  //  3.125 mV
   float voltage = value * bus_LSB;
   return voltage;
 }
 
-//  PAGE 25
+//  PAGE 23  CHECK
 float INA238::getShuntVoltage()
 {
   //  shunt_LSB depends on ADCRANGE in INA238_CONFIG register.
-  float shunt_LSB = 312.5e-9;  //  312.5 nV
+  float shunt_LSB = 5.0e-6;  //  5.0 uV
   if (_ADCRange == true)
   {
-    shunt_LSB = 78.125e-9;     //  78.125 nV
+    shunt_LSB = 1.25e-6;     //  1.25 uV
   }
 
   //  remove reserved bits.
-  int32_t value = _readRegister(INA238_SHUNT_VOLTAGE, 3) >> 4;
-  //  handle negative values (20 bit)
-  if (value & 0x00080000)
-  {
-    value |= 0xFFF00000;
-  }
+  int16_t value = _readRegister(INA238_SHUNT_VOLTAGE, 2);
+  //  int16_t handles negative values (16 bit)
   float voltage = value * shunt_LSB;
   return voltage;
 }
 
-//  PAGE 25 + 8.1.2
+//  PAGE 24 + 8.1.2  CHECK
 float INA238::getCurrent()
 {
   //  remove reserved bits.
-  int32_t value = _readRegister(INA238_CURRENT, 3) >> 4;
-  //  handle negative values (20 bit)
-  if (value & 0x00080000)
-  {
-    value |= 0xFFF00000;
-  }
+  int16_t value = _readRegister(INA238_CURRENT, 2);
+  //  int16_t handles negative values (16 bit)
   float current = value * _current_LSB;
   return current;
 }
 
-//  PAGE 26 + 8.1.2
+//  PAGE 24 + 8.1.2  CHECK
 float INA238::getPower()
 {
+  //  24 bit !!
   uint32_t value = _readRegister(INA238_POWER, 3);
-  //  PAGE 31 (8.1.2)
-  return value * 3.2 * _current_LSB;
+  //  PAGE 28-29 (8.1.2)
+  return value * 0.2 * _current_LSB;  //  formula (4)
 }
 
-//  PAGE 25
+//  PAGE 24  CHECK
 float INA238::getTemperature()
 {
   uint32_t value = _readRegister(INA238_TEMPERATURE, 2);
-  float LSB = 7.8125e-3;  //  milli degree Celsius
+  float LSB = 125e-3;  //  125 milli degree Celsius
   return value * LSB;
 }
+
+
+///////////////////////////////////////
+
 
 
 ////////////////////////////////////////////////////////
