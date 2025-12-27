@@ -1,7 +1,7 @@
 #pragma once
 //    FILE: INA238.h
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.0
+// VERSION: 0.1.1
 //    DATE: 2025-06-11
 // PURPOSE: Arduino library for the INA238, I2C, 16 bit, voltage, current and power sensor.
 //     URL: https://github.com/RobTillaart/INA238
@@ -14,7 +14,7 @@
 #include "Wire.h"
 
 
-#define INA238_LIB_VERSION          (F("0.1.0"))
+#define INA238_LIB_VERSION          (F("0.1.1"))
 
 
 //  for setMode() and getMode()

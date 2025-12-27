@@ -1,6 +1,6 @@
 //    FILE: INA238.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.0
+// VERSION: 0.1.1
 //    DATE: 2025-06-11
 // PURPOSE: Arduino library for the INA238, I2C, 16 bit, voltage, current and power sensor.
 //     URL: https://github.com/RobTillaart/INA238
@@ -95,7 +95,7 @@ float INA238::getBusVoltage()
 {
   //  always positive, remove reserved bits.
   int16_t value = _readRegister(INA238_BUS_VOLTAGE, 2);
-  float bus_LSB = 3.125;  //  3.125 mV
+  float bus_LSB = 3.125e-3;  //  3.125 mV
   float voltage = value * bus_LSB;
   return voltage;
 }
