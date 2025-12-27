@@ -57,7 +57,9 @@ Section 7, Page 12++.
 |  alert timing  |  75 µs.     |
 
 
-No breakout boards are known.
+One breakout board is known.
+https://www.adafruit.com/product/6349
+Not tested.
 
 
 ### Calibrating
@@ -135,7 +137,7 @@ TODO Test
 - https://github.com/RobTillaart/INA229  85 Volt, SPI, 20 bit
 - https://github.com/RobTillaart/INA239  85 Volt, SPI, 16 bit
 - https://github.com/RobTillaart/INA3221_RT  26 Volt, I2C, 13 bits (3 channel)
-- https://www.adafruit.com/product/5832
+- https://www.adafruit.com/product/6349
 - https://www.mateksys.com/?portfolio=i2c-ina-bm
 - https://github.com/RobTillaart/printHelpers  (for scientific notation)
 
