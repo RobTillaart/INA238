@@ -30,12 +30,8 @@ void setup()
   INA.setMaxCurrentShunt(10, 0.015);
 
   //  REGISTER 0
-  Serial.print("Accumulation: ");
-  Serial.println(INA.getAccumulation());
   Serial.print("ConversionDelay: ");
   Serial.println(INA.getConversionDelay());
-  Serial.print("TemperatureCompensation: ");
-  Serial.println(INA.getTemperatureCompensation());
   Serial.print("ADCRange: ");
   Serial.println(INA.getADCRange());
   Serial.println();

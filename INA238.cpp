@@ -58,7 +58,7 @@ INA238::INA238(const uint8_t address, TwoWire *wire)
   //  no calibrated values by default.
   _shunt       = 0.015;
   _maxCurrent  = 10.0;
-  _current_LSB = _maxCurrent * pow(2, -19);
+  _current_LSB = _maxCurrent * pow(2, -15);   //  TODO ??
   _error       = 0;
 }
 
@@ -89,12 +89,12 @@ uint8_t INA238::getAddress()
 //
 //  CORE FUNCTIONS
 //
-//  PAGE 25
+//  PAGE 23  CHECK
 float INA238::getBusVoltage()
 {
   //  always positive, remove reserved bits.
-  int32_t value = _readRegister(INA238_BUS_VOLTAGE, 3) >> 4;
-  float bus_LSB = 195.3125e-6;  //  195.3125 uV
+  int32_t value = _readRegister(INA238_BUS_VOLTAGE, 2);
+  float bus_LSB = 3.125;  //  3.125 mV
   float voltage = value * bus_LSB;
   return voltage;
 }

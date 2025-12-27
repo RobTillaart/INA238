@@ -134,7 +134,7 @@ public:
 
   //
   //  CONFIG REGISTER 0
-  //  read datasheet for details, section 7.6.1.1, page 21  CHECK
+  //  read datasheet for details, section 7.6.1.1, page 21
   //
   void     reset();
   //  Conversion delay in 0..255 steps of 2 ms
@@ -147,7 +147,7 @@ public:
 
   //
   //  CONFIG ADC REGISTER 1
-  //  read datasheet for details, section 7.6.1.2, page 21++  CHECK
+  //  read datasheet for details, section 7.6.1.2, page 21++
   //
   bool     setMode(uint8_t mode = INA238_MODE_CONT_TEMP_BUS_SHUNT);
   uint8_t  getMode();
@@ -163,7 +163,7 @@ public:
 
   //
   //  SHUNT CALIBRATION REGISTER 2
-  //  read datasheet for details, section 7.6.1.3, page 23  CHECK
+  //  read datasheet for details, section 7.6.1.3, page 23
   //  use with care.
   //  maxCurrent <= 204, (in fact no limit)  TODO ??
   //  shunt >= 0.0001.                       TODO ??
@@ -177,7 +177,7 @@ public:
 
   //
   //  DIAGNOSE ALERT REGISTER 11  (0x0B)
-  //  read datasheet for details, section 7.6.1.9, page 24++ CHECK
+  //  read datasheet for details, section 7.6.1.9, page 24++
   //
   void     setDiagnoseAlert(uint16_t flags);
   uint16_t getDiagnoseAlert();
@@ -188,14 +188,10 @@ public:
   uint16_t getDiagnoseAlertBit(uint8_t bit);
 
 
-
-// ------
-
-
-
   //
   //  THRESHOLD AND LIMIT REGISTERS 12-17
-  //  read datasheet for details, section 7.3.7, page 16++
+  //  read datasheet for details, section 7.3.6, page 16++
+  //                              section 7.6.1.10, page 26++
   //
   //  TODO - design and implement better API?
   //
@@ -215,16 +211,18 @@ public:
 
   //
   //  MANUFACTURER and ID REGISTER 3E and 3F
+  //  read datasheet for details, section 7.6.1.16, page 27
   //
   //                               typical value
   uint16_t getManufacturer();  //  0x5449
-  uint16_t getDieID();         //  0x0228
+  uint16_t getDieID();         //  0x0238
   uint16_t getRevision();      //  0x0001
 
   //
   //  ERROR HANDLING
   //
   int      getLastError();
+
 
 protected:
   //  max 4 bytes
