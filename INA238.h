@@ -131,24 +131,6 @@ public:
   //       TEMPERATURE
   float    getTemperature();    //  Celsius
 
-<<<
-  //  the Energy and Charge functions are returning double as they have higher accuracy.
-  //       ENERGY
-  double   getEnergy();         //  Joule or watt second
-  double   getJoule()           { return getEnergy(); };
-  double   getMegaJoule()       { return getEnergy()       * 1e-6; };
-  double   getKiloJoule()       { return getEnergy()       * 1e-3; };
-  double   getMilliJoule()      { return getEnergy()       * 1e3; };
-  double   getMicroJoule()      { return getEnergy()       * 1e6; };
-  double   getWattHour()        { return getEnergy()       * (1.0  / 3600.0); };
-  double   getKiloWattHour()    { return getEnergy()       * (1e-3 / 3600.0); };
-
-  //  CHARGE
-  double   getCharge();         //  Coulombs
-  double   getCoulomb()         { return getCharge(); };
-  double   getMilliCoulomb()    { return getCharge()       * 1e3; };
-  double   getMicroCoulomb()    { return getCharge()       * 1e6; };
-
 
   //
   //  CONFIG REGISTER 0

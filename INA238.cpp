@@ -155,29 +155,6 @@ float INA238::getTemperature()
   return value * LSB;
 }
 
-//  PAGE 26 + 8.1.2
-double INA238::getEnergy()
-{
-  //  read 40 bit UNSIGNED as a double to prevent 64 bit integers
-  //  double might be 8 or 4 byte, depends on platform
-  //  40 bit ==> O(10^12)
-  double value = _readRegisterF(INA238_ENERGY, 'U');
-  //  PAGE 31 (8.1.2)
-  return value * (16 * 3.2) * _current_LSB;
-}
-
-
-//  PAGE 26 + 8.1.2
-double INA238::getCharge()
-{
-  //  read 40 bit SIGNED as a float to prevent 64 bit integers
-  //  double might be 8 or 4 byte, depends on platform
-  //  40 bit ==> O(10^12)
-  double value = _readRegisterF(INA238_CHARGE, 'S');
-  //  PAGE 32 (8.1.2)
-  return value * _current_LSB;
-}
-
 
 ////////////////////////////////////////////////////////
 //

@@ -1,6 +1,6 @@
 {
   "name": "INA238",
-  "keywords": "power,ampere,voltage,volts,current",
+  "keywords": "power,ampere,voltage,volts,current, INA237",
   "description": "Arduino library for the INA238, I2C, 16 bit, voltage, current and power sensor.",
   "authors":
   [
