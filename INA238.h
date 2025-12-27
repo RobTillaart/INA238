@@ -17,9 +17,6 @@
 #define INA238_LIB_VERSION          (F("0.1.0"))
 
 
-//  add INA237.
-
-
 //  for setMode() and getMode()
 enum INA238_mode_enum {
   INA238_MODE_SHUTDOWN            = 0x00,
@@ -165,14 +162,14 @@ public:
   //  SHUNT CALIBRATION REGISTER 2
   //  read datasheet for details, section 7.6.1.3, page 23
   //  use with care.
-  //  maxCurrent <= 204, (in fact no limit)  TODO ??
-  //  shunt >= 0.0001.                       TODO ??
-  //  returns _current_LSB;                  TODO ??
+  //  maxCurrent <= 204, (in fact no limit)
+  //  shunt >= 0.0001.
+  //  returns error code => 0 == OK;
   int      setMaxCurrentShunt(float maxCurrent, float shunt);
-  bool     isCalibrated()    { return _current_LSB != 0.0; };
+  bool     isCalibrated()    { return _current_LSB > 0.0; };
   float    getMaxCurrent();
   float    getShunt();
-  float    getCurrentLSB();
+  float    getCurrentLSB();  //  <= 0.0 means not calibrated.
 
 
   //
@@ -214,7 +211,7 @@ public:
   //  read datasheet for details, section 7.6.1.16, page 27
   //
   //                               typical value
-  uint16_t getManufacturer();  //  0x5449
+  uint16_t getManufacturer();  //  0x5449 ("TI" in ASCII)
   uint16_t getDieID();         //  0x0238
   uint16_t getRevision();      //  0x0001
 
@@ -227,8 +224,6 @@ public:
 protected:
   //  max 4 bytes
   uint32_t _readRegister(uint8_t reg, uint8_t bytes);
-  //  always 5 bytes, mode == U ==> unsigned, otherwise signed
-  double   _readRegisterF(uint8_t reg, char mode);
   uint16_t _writeRegister(uint8_t reg, uint16_t value);
 
   float    _current_LSB;
@@ -243,12 +238,16 @@ protected:
 };
 
 
-///////////////////////////////////////
+//////////////////////////////////////////////////////////////
 //
 //  DERIVED INA237
 //
+class INA237 : public INA238
+{
+public:
+  INA237(const uint8_t address, TwoWire *wire = &Wire);
+};
 
-//  TODO
 
 //  -- END OF FILE --
 

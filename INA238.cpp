@@ -58,7 +58,8 @@ INA238::INA238(const uint8_t address, TwoWire *wire)
   //  no calibrated values by default.
   _shunt       = 0.015;
   _maxCurrent  = 10.0;
-  _current_LSB = _maxCurrent * pow(2, -15);   //  TODO verify ??
+  //  3.0517578125e-5 = pow(2, -15) 8.1.2 formula (2)
+  _current_LSB = _maxCurrent * 3.0517578125e-5;
   _error       = 0;
 }
 
@@ -122,7 +123,7 @@ float INA238::getCurrent()
   //  remove reserved bits.
   int16_t value = _readRegister(INA238_CURRENT, 2);
   //  int16_t handles negative values (16 bit)
-  float current = value * _current_LSB;
+  float current = value * _current_LSB;  //  8.1.2 formula (3)
   return current;
 }
 
@@ -142,10 +143,6 @@ float INA238::getTemperature()
   float LSB = 125e-3;  //  125 milli degree Celsius
   return value * LSB;
 }
-
-
-///////////////////////////////////////
-
 
 
 ////////////////////////////////////////////////////////
@@ -171,7 +168,7 @@ void INA238::setConversionDelay(uint8_t steps)
 uint8_t INA238::getConversionDelay()
 {
   uint16_t value = _readRegister(INA238_CONFIG, 2);
-  return (value >> 6) & 0xFF;
+  return (value >> 6) & 0xFF;  //  8 bits
 }
 
 void INA238::setADCRange(bool flag)
@@ -285,20 +282,20 @@ uint8_t INA238::getAverage()
 int INA238::setMaxCurrentShunt(float maxCurrent, float shunt)
 {
   //  Shunt can be really small
-  if (shunt < 0.0001) return -2;   //  TODO error code
+  if (shunt < 0.0001)   return -2;  //  TODO error code
+  if (maxCurrent < 0.0) return -3;  //  TODO error code
   _maxCurrent = maxCurrent;
   _shunt = shunt;
-  _current_LSB = _maxCurrent * 1.9073486328125e-6;  //  pow(2, -19);
+  _current_LSB = _maxCurrent * 3.0517578125e-5;  //  pow(2, -15);
 
-  //  PAGE 31 (8.1.2)
-  float shunt_cal = 13107.2e6 * _current_LSB * _shunt;
+  //  PAGE 28-29 (8.1.2)
+  float shunt_cal = 819.2e6 * _current_LSB * _shunt;  //  8.1.2  formula (1,2)
   //  depends on ADCRANGE in INA238_CONFIG register.
   if (_ADCRange == true)
   {
     shunt_cal *= 4;
   }
-  //  shunt_cal must be written to REGISTER.
-  //  work in progress PR #7
+  //  shunt_cal must be written to its REGISTER.
   _writeRegister(INA238_SHUNT_CAL, shunt_cal);
 
   return 0;
@@ -369,36 +366,49 @@ uint16_t INA238::getDiagnoseAlertBit(uint8_t bit)
 ////////////////////////////////////////////////////////
 //
 //  THRESHOLD AND LIMIT REGISTERS 12-17
+//  section 7.3.6, 7.6.1.10
 //
-//  TODO - API ?
-
+//  TODO  (sync INA228)
+//  - API
+//  - return bool for setters
+//  - float voltage interface instead of uint16_t?  breaking!
 void INA238::setShuntOvervoltageTH(uint16_t threshold)
 {
   //  TODO ADCRANGE DEPENDENT
+  //  Conversion Factor: 5 μV/LSB when ADCRANGE = 0
+  //  1.25 μV/LSB when ADCRANGE = 1.
+  //  float LSB = 5.0e-6;
+  //  if (_ADCRange == 1) LSB = 1.25e-6;
   _writeRegister(INA238_SOVL, threshold);
 }
 
 uint16_t INA238::getShuntOvervoltageTH()
 {
   //  TODO ADCRANGE DEPENDENT
+  //  float LSB = 5.0e-6;
+  //  if (_ADCRange == 1) LSB = 1.25e-6;
   return _readRegister(INA238_SOVL, 2);
 }
 
 void INA238::setShuntUndervoltageTH(uint16_t threshold)
 {
   //  TODO ADCRANGE DEPENDENT
+  //  float LSB = 5.0e-6;
+  //  if (_ADCRange == 1) LSB = 1.25e-6;
   _writeRegister(INA238_SUVL, threshold);
 }
 
 uint16_t INA238::getShuntUndervoltageTH()
 {
   //  TODO ADCRANGE DEPENDENT
+  //  float LSB = 5.0e-6;
+  //  if (_ADCRange == 1) LSB = 1.25e-6;
   return _readRegister(INA238_SUVL, 2);
 }
 
 void INA238::setBusOvervoltageTH(uint16_t threshold)
 {
-  if (threshold > 0x7FFF) return;
+  if (threshold > 0x7FFF) return;  //  false;
   //float LSB = 3.125e-3;  //  3.125 mV/LSB.
   _writeRegister(INA238_BOVL, threshold);
 }
@@ -424,26 +434,26 @@ uint16_t INA238::getBusUndervoltageTH()
 
 void INA238::setTemperatureOverLimitTH(uint16_t threshold)
 {
-  //float LSB = 7.8125e-3;  //  milliCelsius
+  //float LSB = 125e-3;  //  milli degrees Celsius
   _writeRegister(INA238_TEMP_LIMIT, threshold);
 }
 
 uint16_t INA238::getTemperatureOverLimitTH()
 {
-  //float LSB = 7.8125e-3;  //  milliCelsius
+  //float LSB = 125e-3;  //  milli degrees Celsius
   return _readRegister(INA238_TEMP_LIMIT, 2);
 }
 
 void INA238::setPowerOverLimitTH(uint16_t threshold)
 {
-  //  P29
+  //  P27
   //  Conversion factor: 256 × Power LSB.
   _writeRegister(INA238_POWER_LIMIT, threshold);
 }
 
 uint16_t INA238::getPowerOverLimitTH()
 {
-  //  P29
+  //  P27
   //  Conversion factor: 256 × Power LSB.
   return _readRegister(INA238_POWER_LIMIT, 2);
 }
@@ -518,47 +528,6 @@ uint32_t INA238::_readRegister(uint8_t reg, uint8_t bytes)
 }
 
 
-//  always 5 bytes
-double INA238::_readRegisterF(uint8_t reg, char mode)
-{
-  _error = 0;
-  _wire->beginTransmission(_address);
-  _wire->write(reg);
-  int n = _wire->endTransmission();
-  if (n != 0)
-  {
-    _error = -1;
-    return 0;
-  }
-
-  double value = 0;
-  if (5 == _wire->requestFrom(_address, (uint8_t)5))
-  {
-    uint32_t val = 0;
-    //  fetch 4 MSB bytes first.
-    for (int i = 0; i < 4; i++)
-    {
-      val <<= 8;
-      val |= _wire->read();
-    }
-    //  handle signed / unsigned by casting.
-    if (mode == 'U') value = val;
-    else             value = (int32_t) val;
-    //  process last byte
-    value *= 256;
-    //  note: mar05c
-    uint8_t n = _wire->read();
-    value += n;
-  }
-  else
-  {
-    _error = -2;
-    return 0;
-  }
-  return value;
-}
-
-
 uint16_t INA238::_writeRegister(uint8_t reg, uint16_t value)
 {
   _wire->beginTransmission(_address);
@@ -571,6 +540,17 @@ uint16_t INA238::_writeRegister(uint8_t reg, uint16_t value)
     _error = -1;
   }
   return n;
+}
+
+
+//////////////////////////////////////////////////////////////
+//
+//  DERIVED INA237
+//
+INA237::INA237(const uint8_t address, TwoWire *wire)
+       :INA238(address, wire)
+{
+  //  wrapper for now.
 }
 
 

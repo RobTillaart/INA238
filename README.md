@@ -18,17 +18,25 @@ Arduino library for the INA238 power sensor.
 
 **Experimental**
 
-This readme.md is copied from INA228 and adapted to have similar structure.
-It need a rewrite / verification of everything.
-
 This library controls the INA238, a device that measures voltage,
-current, power, temperature and more.
+current, power and temperature.
+
+The library implements a derived INA237 class which is compatible
+but less precise.
 
 The INA238 sensor differs from the better known INA228.
 Most important difference is that the INA238 has a 16 bit ADC.
+This means it is slightly faster than the 20 bit INA228, but less precise.
+Furthermore the INA238 has no energy and no charge register.
+Finally there is no configurable temperature compensation.
 
+The INA238 also provides an **ALERT** line, to generate an interrupt
+in case a predefined threshold has been met.
+This can be an under- or over-voltage, temperature or power limit.
+The library does not handle the interrupts.
+The alert / limits part of the library's API still needs a redesign.
 
-The library is NOT tested and verified with hardware.
+The library is not yet tested or verified with hardware.
 
 ==> **USE WITH CARE**
 
@@ -38,15 +46,18 @@ Feedback as always is welcome.
 ### Details
 
 The INA238 is a voltage, current and power measurement device.
-A few important data, Read the datasheet for the details, 
-Section x, Page xx++.
+A few important data, Read the datasheet for the details,
+Section 7, Page 12++.
 
 
 |  description   |  value      |  notes  |
 |:---------------|:-----------:|:--------|
-|  bus voltage   |  xx Volt    |  unclear for how long.
+|  bus voltage   |  85 Volt    |  unclear for how long.
 |  ADC           |  16 bit     |
-|  alert timing  |  ?? µs.     |
+|  alert timing  |  75 µs.     |
+
+
+No breakout boards are known.
 
 
 ### Calibrating
@@ -57,13 +68,50 @@ Also the values are not meaningful if there is no shunt connected.
 
 ### Schema LOW SIDE
 
-TODO
+
+```
+         GND                           VCC
+          |                             |
+          |                             |
+          |            +----[ LOAD ]----+
+          |            |                |
+          |            |                |
+      /-------------------------------------\
+      |  VIN-         VIN+             VBUS |
+      |                                     |
+      |                                     |
+      |          INA238 BREAKOUT            |
+      |                                     |
+      |                                     |
+      \-------------------------------------/
+
+```
+
+TODO Test
 
 
 ### Schema HIGH SIDE
 
 
-TODO
+```
+         GND                          VCC
+          |                            |
+          |                            |
+          +---[ LOAD ]---+        +----+
+                         |        |    |
+                         |        |    |
+      /-------------------------------------\
+      |                 VIN-     VIN+  VBUS |
+      |                                     |
+      |                                     |
+      |          INA238 BREAKOUT            |
+      |                                     |
+      |                                     |
+      \-------------------------------------/
+
+```
+
+TODO Test
 
 
 ### Special characters
@@ -83,7 +131,7 @@ TODO
 - https://github.com/RobTillaart/INA226  36 Volt, I2C, 16 bit
 - https://github.com/RobTillaart/INA228  85 Volt, I2C, 20 bit
 - https://github.com/RobTillaart/INA236  48 Volt, I2C, 16 bit
-- https://github.com/RobTillaart/INA238  ?? Volt, I2C, 16 bit
+- https://github.com/RobTillaart/INA238  85 Volt, I2C, 16 bit
 - https://github.com/RobTillaart/INA229  85 Volt, SPI, 20 bit
 - https://github.com/RobTillaart/INA239  85 Volt, SPI, 16 bit
 - https://github.com/RobTillaart/INA3221_RT  26 Volt, I2C, 13 bits (3 channel)
@@ -119,8 +167,10 @@ Note this might differ per breakout board.
 
 ### Performance
 
+TODO run tests and fill performance figures.
+
 Run **INA238_performance.ino** sketch to get a first indication.
-Numbers below are based upon tests with the Adafruit board.
+Numbers below are based upon tests with TODO.
 
 Time in micros, I2C speed in kHz.
 
@@ -134,9 +184,9 @@ Time in micros, I2C speed in kHz.
 |  100  |  getEnergy        |    |
 |  100  |  getCharge        |    |
 |       |                   |    |  other functions similar gain.
-|  200  |  getBusVoltage    |    |   60%
-|  400  |  getBusVoltage    |    |   37%
-|  800  |  getBusVoltage    |    |   27%
+|  200  |  getBusVoltage    |    |
+|  400  |  getBusVoltage    |    |
+|  800  |  getBusVoltage    |    |
 
 
 Most non core functions are as fast as **getTemperature()**
@@ -189,7 +239,7 @@ This value is always positive.
 
 ### SHUNT VOLTAGE
 
-- **float getShuntVoltage()** idem, Returns value in volts.
+- **float getShuntVoltage()** idem. Returns value in volts.
 Note the value can be positive or negative as the INA238 is bidirectional.
 - **float getShuntVolt()**
 - **float getShuntMilliVolt()**
@@ -203,10 +253,6 @@ Note this value can be positive or negative as the INA238 is bidirectional.
 - **float getMilliAmpere()**
 - **float getMicroAmpere()**
 
-### TEMPERATURE
-
-- **float getTemperature()** returns the temperature in Celsius.
-
 ### POWER
 
 - **float getPower()** returns the current x BusVoltage in Watt.
@@ -215,54 +261,21 @@ Note this value can be positive or negative as the INA238 is bidirectional.
 - **float getMicroWatt()**
 - **float getKiloWatt()**
 
-### ENERGY
+### TEMPERATURE
 
-See page 13++, page 32, 8.1.2
-
-The **getEnergy()** only has meaning in continuous mode.
-This is an accumulation register and can be reset to zero by **setAccumulation(1)**.
-
-The accuracy of **getEnergy()** is 1.0% full scale (maximum).
-
-- **double getEnergy()** return Joule (elaborate).
-- **double getJoule()**
-- **double getMegaJoule()**
-- **double getKiloJoule()**
-- **double getMilliJoule()**
-- **double getMicroJoule()**
-- **double getWattHour()**
-- **double getKiloWattHour()**
-
-### CHARGE
-
-The **getCharge()** only has meaning in continuous mode.
-This is an accumulation register and can be reset to zero by **setAccumulation(1)**.
-
-The accuracy of **getCharge()** is 1.0% full scale (maximum).
-
-- **double getCharge()** return Coulomb (elaborate).
-- **double getCoulomb()**
-- **double getMilliCoulomb()**
-- **double getMicroCoulomb()**
+- **float getTemperature()** returns the temperature in Celsius.
 
 
 ### Configuration
 
-Read datasheet for details, section 7.6.1.1, page 22
+Read datasheet for details, section 7.6.1.2, page 21++
 
 - **void reset()** Resets the device, be aware that you need to calibrate the sensor
 (shunt register) again ==> call **setMaxCurrentShunt()** and more.
-- **bool setAccumulation(uint8_t value)** value: 0 == normal operation,  
-1 = clear Energy and Charge registers.
-- **bool getAccumulation()** return set value. (TODO check).
 - **void setConversionDelay(uint8_t steps)**  Conversion delay in 0..255 steps of 2 ms
 - **uint8_t getConversionDelay()** return set value.
-- **void setTemperatureCompensation(bool on)** see Shunt temperature coefficient below.
-- **bool getTemperatureCompensation()** return set value.
-- **void setADCRange(bool flag)** flag = false => 164 mV, true => 41 mV
+- **void setADCRange(bool flag)** flag = false => ~163.84 mV, true => ~40.96 mV
 - **bool getADCRange()** return set value.
-
-TODO: wrapper + better name for setAccumulation().
 
 TODO: examples to show the effect of the ADC configuration.
 
@@ -315,6 +328,8 @@ Read datasheet for details, section 7.6.1.2, page 22++
 | INA238_4120_us      |    7    |
 
 
+### ADC Average
+
 - **bool setAverage(uint8_t avg = INA238_1_SAMPLE)**
 - **uint8_t getAverage()** return set value.
 
@@ -332,45 +347,26 @@ Read datasheet for details, section 7.6.1.2, page 22++
 
 ### Shunt Calibration
 
-To elaborate, read datasheet for details.
+To elaborate, read datasheet for details, section 7.6.1.3, page 23
 
 Note: **setMaxCurrentShunt()** must be called to calibrate your sensor.
 Otherwise several functions will return zero or incorrect data.
 
-- **int setMaxCurrentShunt(float maxCurrent, float shunt)** The maxCurrent 
-depends on breakout used, See section above. 
+- **int setMaxCurrentShunt(float maxCurrent, float shunt)** The maxCurrent
+depends on breakout used, See section above.
 The shunt should be 0.0001 Ω and up.
   - returns 0 if OK.
   - returns -2 if shunt < 0.0001 Ohm. ( Mateksys == 0.0002 Ω )
+  - returns -3 if maxCurrent < 0.0.
 - **bool isCalibrated()** is valid calibration value. The currentLSB > 0.
 - **float getMaxCurrent()** return set value.
 - **float getShunt()** return set value.
-- **float getCurrentLSB()** return actual currenLSB. 0.0 means not calibrated.
-
-
-### Shunt temperature coefficient
-
-Read datasheet for details, page 16.
-
-The INA238 can compensate for shunt temperature variance to increase accuracy.
-The reference temperature is 25°C.
-- Enter the coefficient with **setShuntTemperatureCoefficent(uint16_t ppm)**.
-- Enable the function with **setTemperatureCompensation(true)**.
-
-In formula:
-```
-Radjusted = Rnominal + (Rnominal x (temperature - 25) x PPM) * 10e-6;
-```
-
-- **bool setShuntTemperatureCoefficent(uint16_t ppm = 0)** ppm = 0..16383 ppm/°C.
-Default 0 for easy reset.
-Returns false if ppm is out of range.
-- **uint16_t getShuntTemperatureCoefficent()** returns the set value (default 0).
+- **float getCurrentLSB()** return actual currenLSB. <= 0.0 means not calibrated.
 
 
 ### Diagnose alert
 
-Read datasheet for details, section 7.6.1.12, page 26++.
+Read datasheet for details, section 7.6.1.9, page 24++.
 
 - **void setDiagnoseAlert(uint16_t flags)** set all flags as bit mask.
 - **uint16_t getDiagnoseAlert()** return all flags as bit mask.
@@ -384,10 +380,11 @@ INA238.h has an enum for the bit fields.
 
 ### Threshold and Limits
 
-Read datasheet for details, section 7.3.7, page 16++
+Read datasheet for details, section 7.3.6, page 16++
 
-Note: the implementation of this part is rather minimalistic and 
+Note: the implementation of this part is rather minimalistic and
 might be changed / extended in the future.
+Idem INA228 library.
 
 #### Shunt
 
@@ -416,26 +413,24 @@ might be changed / extended in the future.
 
 ### Manufacturer and ID
 
-- **bool getManufacturer()** Returns 0x5449, can be used to check right sensor.
-- **uint16_t getDieID()** Returns 0x228, can be used to check right sensor.
+- **bool getManufacturer()** Returns 0x5449, can be used to check right sensor. Note 0x5449 == TI in ASCII.
+- **uint16_t getDieID()** Returns 0x238, can be used to check right sensor.
+(INA237 will return 0x237).
 - **uint16_t getRevision()** Returns revision, probably 0x01.
 
 
 ## Future
 
-
 #### Must
 
 - update documentation.
-- test and verify.
-- DiagnoseAlertBit functions
-  - redo API (0.2.0)
+- test and verify with hardware
+- keep sync INA228 where possible.
 
 #### Should
 
 - TODO's in code and docs.
 - add error handling.
-- keep in sync with INA226 where possible.
 - how to detect nothing connected?
   - vshunt >  maxVShunt (new variable)
   - current > maxCurrent
@@ -444,7 +439,7 @@ might be changed / extended in the future.
 
 - write examples, (please share yours).
 - improve unit tests
-- clean up magic numbers in the code
+- clean up magic numbers in the code?
 
 #### Won't
 

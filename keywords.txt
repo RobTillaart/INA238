@@ -2,6 +2,7 @@
 
 
 # Data types (KEYWORD1)
+INA237	KEYWORD1
 INA238	KEYWORD1
 
 
@@ -33,31 +34,11 @@ getKiloWatt	KEYWORD2
 
 getTemperature	KEYWORD2
 
-getEnergy	KEYWORD2
-getJoule	KEYWORD2
-getMegaJoule	KEYWORD2
-getKiloJoule	KEYWORD2
-getMilliJoule	KEYWORD2
-getMicroJoule	KEYWORD2
-getWattHour	KEYWORD2
-getKiloWattHour	KEYWORD2
-
-getCharge	KEYWORD2
-getCoulomb	KEYWORD2
-getMilliCoulomb	KEYWORD2
-getMicroCoulomb	KEYWORD2
-
-
 #########################
 
-
 reset	KEYWORD2
-setAccumulation	KEYWORD2
-getAccumulation	KEYWORD2
 setConversionDelay	KEYWORD2
 getConversionDelay	KEYWORD2
-setTemperatureCompensation	KEYWORD2
-getTemperatureCompensation	KEYWORD2
 setADCRange	KEYWORD2
 getADCRange	KEYWORD2
 
@@ -79,9 +60,6 @@ isCalibrated	KEYWORD2
 getMaxCurrent	KEYWORD2
 getShunt	KEYWORD2
 getCurrentLSB	KEYWORD2
-
-setShuntTemperatureCoefficent	KEYWORD2
-getShuntTemperatureCoefficent	KEYWORD2
 
 
 setDiagnoseAlert	KEYWORD2
