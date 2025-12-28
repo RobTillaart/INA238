@@ -113,7 +113,7 @@ TODO Test
 
 ```
 
-TODO Test
+_Tested - see #2_
 
 
 ### Special characters
