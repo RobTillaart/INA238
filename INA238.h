@@ -66,7 +66,6 @@ enum INA238_timing_enum {
 
 
 //  for diagnose/alert() bit fields.
-//  TODO bit masks?
 enum INA238_diag_enum {
   INA238_DIAG_MEMORY_STATUS      = 0,
   INA238_DIAG_CONVERT_COMPLETE   = 1,
@@ -189,8 +188,6 @@ public:
   //  THRESHOLD AND LIMIT REGISTERS 12-17
   //  read datasheet for details, section 7.3.6, page 16++
   //                              section 7.6.1.10, page 26++
-  //
-  //  TODO - design and implement better API?
   //
   void     setShuntOvervoltageTH(uint16_t threshold);
   uint16_t getShuntOvervoltageTH();
