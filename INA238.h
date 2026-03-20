@@ -95,7 +95,7 @@ public:
   bool     begin();
   bool     isConnected();
   uint8_t  getAddress();
-  bool     setAddress();
+  bool     setAddress(uint8_t newAddress);
 
   //
   //  CORE FUNCTIONS + scale wrappers.
