@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [0.1.3] - 2026-04-14
-- merge #6, Fix getTemperature() + add alert example
+- merge #6, Fix getTemperature() - kudos to CentyLab
+- add alert example
 - add setOverCurrentLimit() + getOverCurrentLimit()
 - minor edits
 
