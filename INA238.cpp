@@ -1,6 +1,6 @@
 //    FILE: INA238.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.2
+// VERSION: 0.1.3
 //    DATE: 2025-06-11
 // PURPOSE: Arduino library for the INA238, I2C, 16 bit, voltage, current and power sensor.
 //     URL: https://github.com/RobTillaart/INA238
@@ -297,6 +297,7 @@ int INA238::setMaxCurrentShunt(float maxCurrent, float shunt)
   _maxCurrent = maxCurrent;
   _shunt = shunt;
   _current_LSB = _maxCurrent / (float)(1UL << 15);  //  pow(2, -15);
+  // _current_LSB = _maxCurrent * 3.0517578125e-5;  //  pow(2, -15);
 
   //  PAGE 28-29 (8.1.2)
   float shunt_cal = 819.2e6 * _current_LSB * _shunt;  //  8.1.2  formula (1,2)
@@ -408,7 +409,7 @@ float INA238::getOverCurrentLimit_mA()
     // Determine LSB based on ADCRANGE
     float lsb = _ADCRange ? 0.00000125f : 0.000005f;
 
-    // Convert raw register → shunt voltage
+    // Convert raw register to shunt voltage
     float v_shunt = raw * lsb;
 
     // Convert shunt voltage → current (A)
