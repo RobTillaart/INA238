@@ -190,8 +190,8 @@ public:
   //  read datasheet for details, section 7.3.6, page 16++
   //                              section 7.6.1.10, page 26++
   //
-  void setOverCurrentLimit(uint32_t milliamp);
-  float getOverCurrentLimit_mA();
+  void     setOverCurrentLimit(uint32_t milliamp);
+  float    getOverCurrentLimit_mA();
   
   void     setShuntOvervoltageTH(uint16_t threshold);
   uint16_t getShuntOvervoltageTH();
